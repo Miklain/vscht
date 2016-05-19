@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 
 /**
- * Trida sprajtu
+ * Trida sprajtu, pro pouzivani existujicih sprajtu
  * 
  * @author Vladislav Solodki
  *
@@ -24,8 +24,7 @@ public class Sprajt {
 		return obrazek.getHeight(null);
 	}
 
-	public void kreslit(Graphics gr, int x, int y) { // Kresli obrazek, gr je
-													// graficky kontext
+	public void kreslit(Graphics gr, int x, int y) { // Kresli obrazek, gr je graficky kontext												
 		gr.drawImage(obrazek, x, y, null);
 	}
 }

@@ -12,51 +12,53 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 /**
- * Trida manipulace zásobami
+ * Trida manipulace zásobami, realizace Singleton třída bude mít jedinou instanci a 
+ * poskytne k ní globální přístupový bod
  * 
- * @author Miklain
+ * @author Vladislav Solodki
  *
  */
 public class KolekceSprajtu {
-	private static KolekceSprajtu jedinacek = new KolekceSprajtu(); 				// jedina instance teto tridy
+        private static KolekceSprajtu jedinacek = new KolekceSprajtu(); // jedina instance tridy
 						
-	public static KolekceSprajtu get() {
-		return jedinacek; 															// vrati instanci tridy
+	public static KolekceSprajtu get() {  // vrati jedinou instanci tridy
+		return jedinacek; 			
 	}
 
-	private HashMap<String, Sprajt> sprajty = new HashMap<String, Sprajt>(); 		// pro cache obrazku
+	private HashMap<String, Sprajt> sprajty = new HashMap<String, Sprajt>();  // pro cache obrazku,
+										// spoji odkazy a obrazky
+	public Sprajt ziskSprajt(String odk) {			// ziska sprajt z KolekceSpajtu									
 
-	public Sprajt ziskSprajt(String odk) {												
-
-		if (sprajty.get(odk) != null) {												// jestli uz mame sprajt v cache, tak vratime ho
+		if (sprajty.get(odk) != null) {			// jestli uz mame sprajt v cache, tak vratime ho
 			return (Sprajt) sprajty.get(odk);
 		}
 
-		BufferedImage zdrojObrazku = null;											
+		BufferedImage zdrojObrazku = null;		// zavadec, ovlada a zpracovava datu obrazku									
 
 		try {
-			URL odkaz = this.getClass().getClassLoader().getResource(odk); 			// odkaz na obrazky modelu
-
-			if (odkaz == null) {
-				chyba("Neni mozne najit soubory" + odk);
+		     URL odkaz = this.getClass().getClassLoader().getResource(odk); // odkaz na obrazky modelu
+		     								    // vrati zdroj 
+		     if (odkaz == null) {
+			chyba("Neni mozne najit soubory " + odk);
 			}
-			zdrojObrazku = ImageIO.read(odkaz); 									// nacitame obrazek
+		     
+		zdrojObrazku = ImageIO.read(odkaz); 	 // nacitame obrazek
 		} catch (IOException e) {
-			chyba("Nejde spustit" + odk);
+			chyba("Nejde spustit " + odk);
 		}
-		GraphicsConfiguration gk = 
-				GraphicsEnvironment.getLocalGraphicsEnvironment()					// vytvori zrychlenou verzi obrazku,
-				.getDefaultScreenDevice() 											// kde ulozime nas sprajt
-				.getDefaultConfiguration();
-		Image obrazek = gk.createCompatibleImage(zdrojObrazku.getWidth(), zdrojObrazku.getHeight(),
-				Transparency.BITMASK);
-		obrazek.getGraphics().drawImage(zdrojObrazku, 0, 0, null);					// kresli obrazek v zrychlenou verzi
-		Sprajt sprajt = new Sprajt(obrazek);										// vytvori sprajt, prida ho do cache a vrati
+		GraphicsConfiguration grafKonfig = 
+				GraphicsEnvironment.getLocalGraphicsEnvironment()// vytvori zrychlenou verzi obrazku,
+				.getDefaultScreenDevice() 		// kde ulozime nas sprajt
+				.getDefaultConfiguration();        // alokujeme grafickou pamet bez pouziti procesoru
+		Image obrazek = grafKonfig.createCompatibleImage(zdrojObrazku.getWidth(), zdrojObrazku.getHeight(),
+				Transparency.BITMASK);    //pruhlednost
+		obrazek.getGraphics().drawImage(zdrojObrazku, 0, 0, null); // kresli nahrany obrazek
+		Sprajt sprajt = new Sprajt(obrazek);			// vytvori sprajt, prida ho do cache
 		sprajty.put(odk, sprajt);
 		return sprajt;
 	}
 
-	private void chyba(String zprava) {					//	V pripade chyby, objevi se zprava a exit
+	private void chyba(String zprava) {	//V pripade chyby, objevi se zprava a exit
 		System.err.println(zprava);
 		System.exit(0);
 	}
